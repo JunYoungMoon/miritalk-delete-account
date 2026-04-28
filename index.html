@@ -2,156 +2,565 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>미리톡 - 계정 삭제 요청</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>미리톡 — 계정 삭제 요청</title>
+  <meta name="theme-color" content="#0A0A14">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%239B87F5'/%3E%3Cpath d='M16 4 L26 9 V16 C26 22 21 26 16 28 C11 26 6 22 6 16 V9 Z' stroke='white' stroke-width='2.4' fill='none' stroke-linejoin='round'/%3E%3C/svg%3E">
   <style>
+    :root {
+      --bg:           #0A0A14;
+      --surface:      #11112A;
+      --surface-deep: #1A1A3E;
+      --primary:      #9B87F5;
+      --primary-deep: #6B4FE8;
+      --primary-light:#BDB0FF;
+      --success:      #4DB896;
+      --danger:       #E05252;
+      --warning:      #E09C40;
+
+      --text:    #EEEEFF;
+      --text-2:  #9090B0;
+      --text-3:  #555570;
+
+      --divider:       rgba(255,255,255,0.10);
+      --card-border:   rgba(155,135,245,0.15);
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      font-family: "Pretendard Variable", Pretendard, "Noto Sans KR",
+        -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
       min-height: 100vh;
-      padding: 40px 16px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.012em;
+      overflow-x: hidden;
     }
-    .card {
-      background: white;
-      border-radius: 16px;
-      padding: 32px 24px;
+
+    /* Ambient */
+    .ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+    .ambient::before, .ambient::after {
+      content: ""; position: absolute; border-radius: 50%;
+      filter: blur(120px); opacity: 0.5;
+    }
+    .ambient::before {
+      width: 580px; height: 580px;
+      background: radial-gradient(circle, var(--primary-deep), transparent 65%);
+      top: -200px; left: -150px;
+    }
+    .ambient::after {
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, #2C1F66, transparent 65%);
+      top: 320px; right: -240px;
+    }
+    .grid-tex {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 56px 56px;
+      mask-image: radial-gradient(ellipse at top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+      -webkit-mask-image: radial-gradient(ellipse at top, rgba(0,0,0,1) 0%, rgba(0,0,0,0) 70%);
+    }
+
+    /* Nav */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      background: rgba(10, 10, 20, 0.7);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .nav-inner {
+      max-width: 720px; margin: 0 auto;
+      padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .logo {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-weight: 800; font-size: 17px; letter-spacing: -0.02em;
+      color: var(--text); text-decoration: none;
+    }
+    .logo-mark {
+      width: 30px; height: 30px;
+      border-radius: 9px;
+      background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary-deep) 100%);
+      box-shadow: 0 4px 14px rgba(155,135,245,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+      display: grid; place-items: center;
+      color: white;
+    }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 9px 16px;
+      background: var(--surface);
+      border: 1px solid var(--divider);
+      border-radius: 10px;
+      color: var(--text); text-decoration: none;
+      font-size: 13px; font-weight: 600;
+      transition: all .18s ease;
+    }
+    .nav-back:hover { border-color: var(--primary); color: var(--primary-light); }
+
+    /* Main wrap */
+    .wrap {
+      position: relative; z-index: 1;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 40px; }
+    .hero-icon {
+      width: 72px; height: 72px;
+      border-radius: 20px;
+      margin: 0 auto 22px;
+      background:
+        radial-gradient(circle at 30% 20%, rgba(224,82,82,0.35), transparent 70%),
+        linear-gradient(135deg, rgba(224,82,82,0.18), rgba(155,135,245,0.10));
+      border: 0.5px solid rgba(224,82,82,0.4);
+      display: grid; place-items: center;
+      color: #FFB0B8;
+      box-shadow: 0 12px 40px rgba(224,82,82,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 6px 14px;
+      border-radius: 100px;
+      background: rgba(224,82,82,0.12);
+      border: 1px solid rgba(224,82,82,0.30);
+      color: #FFB0B8;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: clamp(30px, 4.6vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.035em;
+      margin-bottom: 14px;
+    }
+    h1 .accent {
+      background: linear-gradient(135deg, #FFB0B8 0%, var(--danger) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+    .lead {
+      font-size: 15.5px;
+      color: var(--text-2);
       max-width: 480px;
-      width: 100%;
-      box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+      margin: 0 auto;
+      letter-spacing: -0.012em;
+      line-height: 1.7;
     }
-    .app-name {
-      font-size: 22px;
-      font-weight: 700;
-      color: #1a1a1a;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      font-size: 14px;
-      color: #888;
-      margin-bottom: 28px;
-    }
-    h2 {
-      font-size: 18px;
-      font-weight: 600;
-      color: #e53935;
+
+    /* Card */
+    .card {
+      background: linear-gradient(180deg, var(--surface), rgba(17,17,42,0.6));
+      border: 0.5px solid var(--divider);
+      border-radius: 20px;
+      padding: 28px;
       margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .25s ease;
     }
-    .section {
-      margin-bottom: 24px;
+    .card:hover { border-color: rgba(155,135,245,0.22); }
+
+    .card-head {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 18px;
     }
-    .section-title {
+    .card-ic {
+      width: 36px; height: 36px;
+      border-radius: 11px;
+      display: grid; place-items: center;
+      background: rgba(155,135,245,0.12);
+      border: 0.5px solid rgba(155,135,245,0.25);
+      color: var(--primary-light);
+      flex-shrink: 0;
+    }
+    .card-title {
+      font-size: 16px; font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.02em;
+    }
+
+    /* Data list */
+    .data-list { list-style: none; }
+    .data-list li {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 0;
+      border-bottom: 0.5px solid rgba(255,255,255,0.04);
       font-size: 14px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 8px;
+      color: var(--text-2);
     }
-    ul {
-      padding-left: 18px;
-      color: #555;
-      font-size: 14px;
-      line-height: 1.8;
+    .data-list li:last-child { border-bottom: none; }
+    .data-list li::before {
+      content: "";
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+      box-shadow: 0 0 6px rgba(155,135,245,0.6);
+      flex-shrink: 0;
     }
+    .data-list li strong { color: var(--text); font-weight: 700; }
+
+    /* Period grid */
+    .period-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .period-item {
+      padding: 14px 16px;
+      background: var(--surface-deep);
+      border: 0.5px solid var(--divider);
+      border-radius: 12px;
+    }
+    .period-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--text-3);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .period-value {
+      font-size: 15.5px; font-weight: 800;
+      color: var(--primary-light);
+      letter-spacing: -0.02em;
+    }
+    .period-value.warn { color: var(--warning); }
+
+    /* Steps */
     .steps {
-      counter-reset: step;
       list-style: none;
-      padding: 0;
+      counter-reset: step;
+      display: flex; flex-direction: column;
+      gap: 10px;
     }
     .steps li {
       counter-increment: step;
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
-      font-size: 14px;
-      color: #444;
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 14px 16px;
+      background: var(--surface-deep);
+      border: 0.5px solid var(--divider);
+      border-radius: 12px;
+      font-size: 14.5px;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      transition: all .2s ease;
+    }
+    .steps li:hover {
+      border-color: rgba(155,135,245,0.3);
+      transform: translateX(2px);
     }
     .steps li::before {
-      content: counter(step);
-      background: #e53935;
-      color: white;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      min-width: 22px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
+      content: counter(step, decimal-leading-zero);
+      flex-shrink: 0;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: rgba(155,135,245,0.12);
+      border: 0.5px solid rgba(155,135,245,0.28);
+      color: var(--primary-light);
+      display: grid; place-items: center;
+      font-size: 11px; font-weight: 800;
+      font-family: ui-monospace, "SF Mono", Menlo, monospace;
+      letter-spacing: -0.02em;
     }
+
+    /* Email button */
     .email-btn {
-      display: block;
-      background: #e53935;
+      position: relative;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-deep) 100%);
       color: white;
-      text-align: center;
-      padding: 14px;
-      border-radius: 10px;
+      text-decoration: none;
+      border-radius: 14px;
+      font-weight: 700; font-size: 15px;
+      letter-spacing: -0.015em;
+      transition: transform .2s ease, box-shadow .2s ease;
+      box-shadow:
+        0 14px 32px rgba(107, 79, 232, 0.40),
+        inset 0 1px 0 rgba(255,255,255,0.2);
+      overflow: hidden;
+    }
+    .email-btn::before {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.25) 50%, transparent 70%);
+      transform: translateX(-100%);
+      transition: transform .8s ease;
+    }
+    .email-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 38px rgba(107,79,232,0.55), inset 0 1px 0 rgba(255,255,255,0.3);
+    }
+    .email-btn:hover::before { transform: translateX(100%); }
+    .email-btn:active { transform: translateY(0); }
+    .email-btn .arrow { transition: transform .2s ease; }
+    .email-btn:hover .arrow { transform: translateX(3px); }
+
+    .email-meta {
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; flex-wrap: wrap;
+      margin-top: 14px;
+      font-size: 12.5px;
+      color: var(--text-3);
+    }
+    .email-meta a {
+      color: var(--text-2);
       text-decoration: none;
       font-weight: 600;
-      font-size: 15px;
-      margin-top: 8px;
+      transition: color .2s;
     }
+    .email-meta a:hover { color: var(--primary-light); }
+    .email-meta .sep {
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--text-3);
+    }
+
+    /* Notice */
     .notice {
-      background: #fff3f3;
-      border-left: 4px solid #e53935;
-      border-radius: 4px;
-      padding: 12px 16px;
-      font-size: 13px;
-      color: #c62828;
-      line-height: 1.6;
+      background: rgba(224,82,82,0.07);
+      border: 0.5px solid rgba(224,82,82,0.25);
+      border-left: 2px solid var(--danger);
+      border-radius: 0 12px 12px 0;
+      padding: 16px 20px;
+      margin-top: 16px;
+      display: flex; align-items: flex-start; gap: 12px;
+    }
+    .notice svg {
+      color: #FFB0B8;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .notice-text {
+      font-size: 13.5px;
+      color: var(--text-2);
+      line-height: 1.65;
+      letter-spacing: -0.01em;
+    }
+    .notice-text strong { color: #FFB0B8; font-weight: 700; }
+
+    /* Footer */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 0.5px solid var(--divider);
+      padding: 36px 24px 56px;
+      text-align: center;
+      max-width: 720px;
+      margin: 32px auto 0;
+      color: var(--text-3);
+      font-size: 12.5px;
+    }
+    footer .footer-logo {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-weight: 800; font-size: 14px;
+      color: var(--text-2);
+      margin-bottom: 6px;
+    }
+    footer .footer-logo .logo-mark {
+      width: 22px; height: 22px; border-radius: 7px;
+    }
+    footer a {
+      color: var(--text-2); text-decoration: none;
+      font-weight: 600;
+      margin: 0 8px;
+      transition: color .2s;
+    }
+    footer a:hover { color: var(--primary-light); }
+
+    @media (max-width: 560px) {
+      .wrap { padding: 40px 18px 60px; }
+      .card { padding: 22px 20px; }
+      .period-grid { grid-template-columns: 1fr; }
+      .nav-inner { padding: 12px 18px; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="app-name">미리톡</div>
-    <div class="subtitle">사기 대화 분석 서비스</div>
+  <div class="ambient" aria-hidden="true"></div>
+  <div class="grid-tex" aria-hidden="true"></div>
 
-    <h2>계정 및 데이터 삭제 요청</h2>
+  <!-- NAV -->
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">
+        <span class="logo-mark" aria-hidden="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+        </span>
+        <span>미리톡</span>
+      </a>
+      <a href="index.html" class="nav-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="19" y1="12" x2="5" y2="12"/>
+          <polyline points="12 19 5 12 12 5"/>
+        </svg>
+        홈으로
+      </a>
+    </div>
+  </nav>
 
-    <div class="section">
-      <div class="section-title">📋 삭제되는 데이터</div>
-      <ul>
-        <li>계정 정보 (이름, 이메일)</li>
-        <li>제출한 대화 분석 내역</li>
-        <li>분석 결과 및 기록</li>
+  <main class="wrap">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-icon" aria-hidden="true">
+        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="3 6 5 6 21 6"/>
+          <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+          <path d="M10 11v6"/>
+          <path d="M14 11v6"/>
+          <path d="M9 6V4a2 2 0 012-2h2a2 2 0 012 2v2"/>
+        </svg>
+      </div>
+      <div class="badge">Account Deletion</div>
+      <h1>
+        계정 및 데이터<br/>
+        <span class="accent">삭제 요청</span>
+      </h1>
+      <p class="lead">
+        미리톡에서 수집한 모든 정보를 삭제할 수 있습니다.<br/>
+        앱에서 직접 삭제하거나, 이메일로 요청해 주세요.
+      </p>
+    </section>
+
+    <!-- 삭제되는 데이터 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="9" y1="13" x2="15" y2="13"/>
+            <line x1="9" y1="17" x2="15" y2="17"/>
+          </svg>
+        </div>
+        <div class="card-title">삭제되는 데이터</div>
+      </div>
+      <ul class="data-list">
+        <li><strong>계정 정보</strong> — 이름, 이메일, 프로필</li>
+        <li><strong>제출한 대화 분석 내역</strong> — 캡처 이미지, 텍스트</li>
+        <li><strong>분석 결과 및 기록</strong> — 위험도, 분석 리포트</li>
+        <li><strong>앱 사용 기록</strong> — 접속 로그, 활동 이력</li>
       </ul>
     </div>
 
-    <div class="section">
-      <div class="section-title">⏱ 데이터 보관 기간</div>
-      <ul>
-        <li>삭제 요청 후 <strong>7일 이내</strong> 완전 삭제</li>
-        <li>법적 의무 보관 데이터 제외 (최대 1년)</li>
-      </ul>
+    <!-- 보관 기간 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+        <div class="card-title">데이터 보관 기간</div>
+      </div>
+      <div class="period-grid">
+        <div class="period-item">
+          <div class="period-label">완전 삭제</div>
+          <div class="period-value">7일 이내</div>
+        </div>
+        <div class="period-item">
+          <div class="period-label">법적 의무 보관</div>
+          <div class="period-value warn">최대 1년</div>
+        </div>
+      </div>
     </div>
 
-    <div class="section">
-      <div class="section-title">🗑 앱에서 직접 삭제하는 방법</div>
+    <!-- 앱에서 직접 삭제 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+            <line x1="12" y1="18" x2="12.01" y2="18"/>
+          </svg>
+        </div>
+        <div class="card-title">앱에서 직접 삭제하는 방법</div>
+      </div>
       <ol class="steps">
         <li>미리톡 앱 실행</li>
-        <li>하단 메뉴 → 설정(⚙️) 탭 이동</li>
+        <li>좌측 상단 메뉴 → 설정 탭으로 이동</li>
         <li>"계정 관리" 선택</li>
         <li>"계정 삭제" 버튼 탭</li>
         <li>확인 후 즉시 삭제 처리</li>
       </ol>
     </div>
 
-    <div class="section">
-      <div class="section-title">📧 이메일로 삭제 요청</div>
-      <a class="email-btn" href="mailto:junyoungmoon9857@gmail.com?subject=계정 삭제 요청&body=가입 이메일: %0A삭제 요청 사유(선택):">
+    <!-- 이메일 요청 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-ic">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+            <polyline points="22,6 12,13 2,6"/>
+          </svg>
+        </div>
+        <div class="card-title">이메일로 삭제 요청</div>
+      </div>
+      <a class="email-btn" href="/cdn-cgi/l/email-protection#7b110e1502140e151c1614141542434e4c3b1c161a12175518141644080e19111e180f4691c8ff97dbee5b97f9d697dbe75b97e1ef97c9d65d19141f024691cbfb97e5fe5b97e6cf90d2ef97e6c7415b5e4b3a97f9d697dbe75b97e1ef97c9d65b97f9d797e7db5397ffdb96f8e65241">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+          <polyline points="22,6 12,13 2,6"/>
+        </svg>
         삭제 요청 이메일 보내기
+        <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"/>
+          <polyline points="12 5 19 12 12 19"/>
+        </svg>
       </a>
+      <div class="email-meta">
+        <a href="/cdn-cgi/l/email-protection#503a253e293f253e373d3f3f3e6968656710373d31393c7e333f3d"><span class="__cf_email__" data-cfemail="e58f908b9c8a908b82888a8a8bdcddd0d2a58288848c89cb868a88">[email&#160;protected]</span></a>
+        <span class="sep"></span>
+        <span>영업일 기준 3일 이내 처리</span>
+      </div>
     </div>
 
+    <!-- Notice -->
     <div class="notice">
-      삭제 요청 후에는 데이터를 복구할 수 없습니다.<br/>
-      문의: junyoungmoon9857@gmail.com
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="notice-text">
+        <strong>삭제 후에는 데이터를 복구할 수 없습니다.</strong><br/>
+        삭제가 완료되면 분석 내역, 결과, 계정 정보가 영구적으로 사라집니다. 신중히 결정해 주세요.
+      </div>
     </div>
-  </div>
-</body>
+
+  </main>
+
+  <footer>
+    <div class="footer-logo">
+      <span class="logo-mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
+      </span>
+      <span>미리톡</span>
+    </div>
+    <p>속기 전에, 먼저 확인하세요.</p>
+    <div style="margin-top:10px;">
+      <a href="index.html">홈</a>
+      <a href="privacy.html">개인정보처리방침</a>
+    </div>
+  </footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
 </html>
